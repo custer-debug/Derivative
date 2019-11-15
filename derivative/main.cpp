@@ -4,17 +4,28 @@
 
 template<class T>
 void Print_Vector(const std::vector<T>& v);				//Print vector of any types
-void Founder_Power(const std::string& s);				//Looking for polynomial degrees
+std::vector<int> Founder_Power(const std::string& s);				//Looking power
+std::vector<int> Founder_odds(const std::string& s);				//Looking odds
 int Concatenation(std::vector<int>& vector_pow);		//Concatenates vector elements into one number
-void Asci_function(std::vector<int>& vector_ascii);
+void Asci_function(std::vector<int>& vector_ascii);		
+
+
+void derivative(std::string polynomial)
+{
+	//std::vector<int> Power = Founder_Power(polynomial);
+	std::vector<int> odds = Founder_odds(polynomial);
+
+
+
+}
+
 
 
 
 int main() 
 {
-
-	std::string str = {"-x^10000-12*x^21+32*x^20+5*x^32+3*x^4+3"};
-	Founder_Power(str);
+	std::string str = {"-x^2-4*x-54*x-9999*x"};
+	derivative(str);
 
 	return 0;
 }
@@ -36,7 +47,62 @@ void Print_Vector(const std::vector<T>& v)
 
 
 
-void Founder_Power(const std::string& s)
+
+std::vector<int> Founder_odds(const std::string& s)
+{
+	std::vector<int> odds;
+	std::vector<int> odds_in_function;
+	auto it = s.cbegin();
+	for (; it != s.cend(); it++) 
+	{
+		if (*it == 'x')
+		{
+			auto it1 = it;
+			if(it1 == s.begin())
+			{
+				
+				odds_in_function.push_back(1);
+				continue;
+
+
+			}
+			else
+				it1--;
+
+
+			if (*it1 == '*')
+				it1--;
+
+			do
+			{
+				if (*it1 == '-')
+				{
+					odds.push_back(-1);
+					break;
+				}
+				else if (*it1 == '+')
+					break;
+
+			
+				
+
+				odds.push_back(*it1);
+				it1--;
+			} while (it1 != s.cbegin());
+
+			
+			odds_in_function.push_back(Concatenation(odds));
+			
+		}
+		
+		
+	}
+	Print_Vector(odds_in_function);
+	return odds;
+}
+
+
+std::vector<int> Founder_Power(const std::string& s)
 {
 	std::vector<int> Number_of_power;
 	std::vector<int> Pow_of_function;
@@ -57,7 +123,8 @@ void Founder_Power(const std::string& s)
 		}
 
 	}
-	Print_Vector(Pow_of_function);
+	//Print_Vector(Pow_of_function);
+	return Pow_of_function;
 }
 
 
@@ -78,6 +145,7 @@ void Asci_function(std::vector<int>& vector_ascii)
 		case 55:vector_ascii[i] = 7;	break;
 		case 56:vector_ascii[i] = 8;	break;
 		case 57:vector_ascii[i] = 9;	break;
+		case -1:vector_ascii[i] = -1;   break;
 
 		default:
 			std::cout << "This is not a number! " << vector_ascii[i] << \
@@ -90,10 +158,6 @@ void Asci_function(std::vector<int>& vector_ascii)
 }
 
 
-
-
-
-
 int Concatenation(std::vector<int>& vector_pow)
 {
 
@@ -102,6 +166,16 @@ int Concatenation(std::vector<int>& vector_pow)
 
 	int power = 0;
 	int coef = 1;
+
+	if (*(vector_pow.end() - 1) < 0 && vector_pow.size() > 1)
+	{
+		vector_pow.pop_back();
+		power =	*(vector_pow.begin()) * -1;
+		vector_pow.clear();
+		return power;
+
+	}
+
 	auto it = vector_pow.rbegin();
 	for (; it != vector_pow.rend(); it++)
 	{
