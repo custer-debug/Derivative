@@ -3,19 +3,24 @@
 #include <algorithm>
 
 template<class T>
-void Print_Vector(const std::vector<T>& v);				//Print vector of any types
-std::vector<int> Founder_Power(const std::string& s);				//Looking power
-std::vector<int> Founder_odds(const std::string& s);				//Looking odds
-int Concatenation(std::vector<int>& vector_pow);		//Concatenates vector elements into one number
+void Print_Vector(const std::vector<T>&);				//Print vector of any types
+std::vector<int> Founder_Power(const std::string&);				//Looking power
+std::vector<int> Founder_odds(const std::string&);				//Looking odds
 bool Asci_function(std::vector<int>& vector_ascii);		
+int ConcForNegativeNumber(std::vector<int>& vector_pow);
+int ConcForPositiveNumber(std::vector<int>& vector_pow,bool);
+
+
+
 
 
 void derivative(std::string& polynomial)
 {
 	std::vector<int> Power = Founder_Power(polynomial);
-//	std::vector<int> odds = Founder_odds(polynomial);
-	//Print_Vector(odds);
-	//Print_Vector(Power);
+	std::vector<int> Odds = Founder_odds(polynomial);
+
+
+
 
 }
 
@@ -24,13 +29,11 @@ void derivative(std::string& polynomial)
 
 int main() 
 {
-	std::string str = {"+9832*x^23-654*x^42+432*x^42+42343*x^42"};
+	std::string str = {"43253*x^4324+867*x^4324-432*x^2-4"};
 	derivative(str);
+
 	return 0;
 }
-
-
-
 
 
 template<class T>
@@ -54,10 +57,10 @@ std::vector<int> Founder_odds(const std::string& s)
 	auto it = s.cbegin();
 	for (; it != s.cend(); it++) 
 	{
-		if (*it == 'x')
+		if (*it == 'x')	//Find virable
 		{
 			auto it1 = it;
-			if (it1 == s.begin())
+			if (it1 == s.begin()) 
 			{
 				odds_in_function.push_back(1);
 				continue;
@@ -82,6 +85,7 @@ std::vector<int> Founder_odds(const std::string& s)
 					break;
 				}
 
+
 				if (*it1 == '-')
 				{
 					odds.push_back(-1);
@@ -89,19 +93,23 @@ std::vector<int> Founder_odds(const std::string& s)
 				}
 				else if (*it1 == '+')
 					break;
-				
 
 				odds.push_back(*it1);
 				it1--;
 
 			}
 
-			odds_in_function.push_back(Concatenation(odds));
+			odds_in_function.push_back(*(odds.cend() - 1) > 0 ? ConcForPositiveNumber(odds,true) :\
+				ConcForNegativeNumber(odds));
 		}	
+
 	}
-	Print_Vector(odds_in_function);
-	return odds;
+	
+	return odds_in_function;
 }
+
+
+
 std::vector<int> Founder_Power(const std::string& s)
 {
 	std::vector<int> Number_of_power;
@@ -115,15 +123,24 @@ std::vector<int> Founder_Power(const std::string& s)
 			it++;
 			do
 			{
+				if (it == s.cend() - 1)
+				{
+					Number_of_power.push_back(*it);
+					break;
+				}
+
+
 				Number_of_power.push_back(*it);
 				it++;
+
 			} while (*it != '+' && *it != '-');
 
-			Pow_of_function.push_back(Concatenation(Number_of_power));
+			Pow_of_function.push_back(ConcForPositiveNumber(Number_of_power,false) );
+		
 		}
 
 	}
-	Print_Vector(Pow_of_function);
+	
 	return Pow_of_function;
 }
 
@@ -146,7 +163,8 @@ bool Asci_function(std::vector<int>& vector_ascii)
 		case 56:vector_ascii[i] = 8;	break;
 		case 57:vector_ascii[i] = 9;	break;
 		case -1:vector_ascii[i] = -1;   break;
-			case int('+') : vector_ascii.erase(std::begin(vector_ascii) + i, std::begin(vector_ascii) + i + 1); break;
+			case int('+') : vector_ascii.erase(std::begin(vector_ascii) + i,\
+				std::begin(vector_ascii) + i + 1); break;
 		default:
 			std::cout << "This is not a number! " << \
 			 vector_ascii[i] << std::endl;
@@ -158,40 +176,58 @@ bool Asci_function(std::vector<int>& vector_ascii)
 }
 
 
-int Concatenation(std::vector<int>& vector_pow)
+
+int Concantination(std::vector<int>& vector) 
+{
+	int con = 0;
+	int coef = 1;
+
+	auto it = vector.rbegin();
+	for (; it != vector.rend(); it++)
+	{
+		con += *it * coef;
+		coef *= 10;
+	}
+	vector.clear();
+	return con;
+}
+
+
+
+
+int ConcForNegativeNumber(std::vector<int>& vector_pow)
 {
 	if (!Asci_function(vector_pow))
 		return 0;
 
-	int power = 0;
-	int coef = 1;
-
 	if (*(vector_pow.end() - 1) < 0 && vector_pow.size() > 1)
 	{
+
 		vector_pow.pop_back();
-		std::reverse(std::begin(vector_pow),std::end(vector_pow));
-		auto it = vector_pow.rbegin();
-		for (; it != vector_pow.rend(); it++)
-		{
-			power += *it * coef;
-			coef *= 10;
-
-		}
-		vector_pow.clear();
-		return power * -1;
-	}
-	std::reverse(std::begin(vector_pow), std::end(vector_pow));
-	auto it = vector_pow.rbegin();
-	for (; it != vector_pow.rend(); it++)
-	{
-		power += *it * coef;
-		coef *= 10;
+		std::reverse(std::begin(vector_pow), std::end(vector_pow));
+		return Concantination(vector_pow) * -1;
 
 	}
-
 	vector_pow.clear();
-	return power;
+	return -1;
 }
+
+
+
+
+
+int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
+{
+	if (!Asci_function(vector_pow))
+		return 0;
+
+	if (flag)
+		std::reverse(std::begin(vector_pow), std::end(vector_pow));
+
+	return Concantination(vector_pow);
+
+}
+
 
 
 
