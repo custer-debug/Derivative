@@ -1,45 +1,27 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <windows.h>
+				
+HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
-template<class T>
-void Print_Vector(const std::vector<T>&);				//Print vector of any types
+
 std::vector<int> Founder_Power(const std::string&);				//Looking power
 std::vector<int> Founder_odds(const std::string&);				//Looking odds
-bool Asci_function(std::vector<int>& vector_ascii);		
 int ConcForNegativeNumber(std::vector<int>& vector_pow);
 int ConcForPositiveNumber(std::vector<int>& vector_pow,bool);
-
-
-
-
-
-void derivative(std::string& polynomial)
-{
-	std::vector<int> Power = Founder_Power(polynomial);
-	std::vector<int> Odds = Founder_odds(polynomial);
-
-
-
-
-}
-
-
-
-
-int main() 
-{
-	std::string str = {"43253*x^4324+867*x^4324-432*x^2-4"};
-	derivative(str);
-
-	return 0;
-}
 
 
 template<class T>
 void Print_Vector(const std::vector<T>& v)
 {
+	
 	auto it = v.cbegin();
+	if (v.cbegin() == v.cend())
+	{
+		std::cout << "No items " << std::endl;
+		return;
+	}
 	for (; it != v.cend(); it++)
 		std::cout << *it << " ";
 
@@ -49,6 +31,42 @@ void Print_Vector(const std::vector<T>& v)
 
 
 
+void derivative(const std::string& polynomial)
+{	
+	
+
+	std::vector<int> Power = Founder_Power(polynomial);
+	std::vector<int> Odds = Founder_odds(polynomial);
+
+	if (Power.size() != Odds.size())
+	{
+		SetConsoleTextAttribute(console, FOREGROUND_RED);
+		std::cout << "The number of degrees does not match the number of values" << std::endl;
+		return ;
+	}
+	SetConsoleTextAttribute(console, FOREGROUND_GREEN);
+	std::cout << "Power:\t" << " ";
+	Print_Vector(Power);
+	std::cout << "Odds:\t" << " ";
+	Print_Vector(Odds);
+	
+	
+
+}
+
+
+
+int main() 
+{
+	std::string str = {"x^2+x"};
+	derivative(str);
+		
+	system("pause>nul");
+	return 0;
+}
+
+
+#pragma region Parser
 
 std::vector<int> Founder_odds(const std::string& s)
 {
@@ -68,8 +86,22 @@ std::vector<int> Founder_odds(const std::string& s)
 			else
 				it1--;
 
+
 			if (*it1 == '*')
 				it1--;
+			else if (*it1 == '-')
+			{
+				odds_in_function.push_back(-1);
+				continue;
+			}
+			else if (*it1 == '+')
+			{
+				odds_in_function.push_back(1);
+				continue;
+			}	
+				
+
+			
 
 			while (true)
 			{
@@ -85,11 +117,11 @@ std::vector<int> Founder_odds(const std::string& s)
 					break;
 				}
 
-
 				if (*it1 == '-')
 				{
 					odds.push_back(-1);
 					break;
+
 				}
 				else if (*it1 == '+')
 					break;
@@ -98,17 +130,15 @@ std::vector<int> Founder_odds(const std::string& s)
 				it1--;
 
 			}
-
-			odds_in_function.push_back(*(odds.cend() - 1) > 0 ? ConcForPositiveNumber(odds,true) :\
+			odds_in_function.push_back(*(odds.cend() - 1) > 0 ? ConcForPositiveNumber(odds, true) : \
 				ConcForNegativeNumber(odds));
+			
 		}	
-
+		
 	}
 	
 	return odds_in_function;
 }
-
-
 
 std::vector<int> Founder_Power(const std::string& s)
 {
@@ -137,14 +167,23 @@ std::vector<int> Founder_Power(const std::string& s)
 
 			Pow_of_function.push_back(ConcForPositiveNumber(Number_of_power,false) );
 		
+		
+		}else if(*it == 'x')
+		{
+
+			if (it == s.cend() - 1)
+			{
+				Pow_of_function.push_back(1);
+				break;
+			}
+			if (*(it + 1) == '+' || *(it + 1) == '-' )
+				Pow_of_function.push_back(1);
 		}
 
 	}
 	
 	return Pow_of_function;
 }
-
-
 
 bool Asci_function(std::vector<int>& vector_ascii) 
 {
@@ -163,6 +202,8 @@ bool Asci_function(std::vector<int>& vector_ascii)
 		case 56:vector_ascii[i] = 8;	break;
 		case 57:vector_ascii[i] = 9;	break;
 		case -1:vector_ascii[i] = -1;   break;
+		case 1:vector_ascii[i] = 1;   break;
+
 			case int('+') : vector_ascii.erase(std::begin(vector_ascii) + i,\
 				std::begin(vector_ascii) + i + 1); break;
 		default:
@@ -174,8 +215,6 @@ bool Asci_function(std::vector<int>& vector_ascii)
 	}
 	return true;
 }
-
-
 
 int Concantination(std::vector<int>& vector) 
 {
@@ -191,9 +230,6 @@ int Concantination(std::vector<int>& vector)
 	vector.clear();
 	return con;
 }
-
-
-
 
 int ConcForNegativeNumber(std::vector<int>& vector_pow)
 {
@@ -212,10 +248,6 @@ int ConcForNegativeNumber(std::vector<int>& vector_pow)
 	return -1;
 }
 
-
-
-
-
 int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
 {
 	if (!Asci_function(vector_pow))
@@ -228,7 +260,7 @@ int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
 
 }
 
-
+#pragma endregion
 
 
 
