@@ -10,12 +10,12 @@ int Concatenation(std::vector<int>& vector_pow);		//Concatenates vector elements
 bool Asci_function(std::vector<int>& vector_ascii);		
 
 
-void derivative(std::string polynomial)
+void derivative(std::string& polynomial)
 {
-	//std::vector<int> Power = Founder_Power(polynomial);
-	std::vector<int> odds = Founder_odds(polynomial);
-
-
+	std::vector<int> Power = Founder_Power(polynomial);
+//	std::vector<int> odds = Founder_odds(polynomial);
+	//Print_Vector(odds);
+	//Print_Vector(Power);
 
 }
 
@@ -24,9 +24,8 @@ void derivative(std::string polynomial)
 
 int main() 
 {
-	std::string str = {"-987123*x+9832*x"};
+	std::string str = {"+9832*x^23-654*x^42+432*x^42+42343*x^42"};
 	derivative(str);
-
 	return 0;
 }
 
@@ -78,6 +77,7 @@ std::vector<int> Founder_odds(const std::string& s)
 						odds.push_back(-1);
 						break;
 					}
+
 					odds.push_back(*it1);
 					break;
 				}
@@ -89,7 +89,7 @@ std::vector<int> Founder_odds(const std::string& s)
 				}
 				else if (*it1 == '+')
 					break;
-
+				
 
 				odds.push_back(*it1);
 				it1--;
@@ -98,12 +98,10 @@ std::vector<int> Founder_odds(const std::string& s)
 
 			odds_in_function.push_back(Concatenation(odds));
 		}	
-
 	}
+	Print_Vector(odds_in_function);
 	return odds;
 }
-
-
 std::vector<int> Founder_Power(const std::string& s)
 {
 	std::vector<int> Number_of_power;
@@ -125,7 +123,7 @@ std::vector<int> Founder_Power(const std::string& s)
 		}
 
 	}
-	//Print_Vector(Pow_of_function);
+	Print_Vector(Pow_of_function);
 	return Pow_of_function;
 }
 
@@ -148,10 +146,10 @@ bool Asci_function(std::vector<int>& vector_ascii)
 		case 56:vector_ascii[i] = 8;	break;
 		case 57:vector_ascii[i] = 9;	break;
 		case -1:vector_ascii[i] = -1;   break;
-
+			case int('+') : vector_ascii.erase(std::begin(vector_ascii) + i, std::begin(vector_ascii) + i + 1); break;
 		default:
 			std::cout << "This is not a number! " << \
-			 (char)vector_ascii[i] << std::endl;
+			 vector_ascii[i] << std::endl;
 			return false;
 			break;
 		}
@@ -179,6 +177,7 @@ int Concatenation(std::vector<int>& vector_pow)
 			coef *= 10;
 
 		}
+		vector_pow.clear();
 		return power * -1;
 	}
 	std::reverse(std::begin(vector_pow), std::end(vector_pow));
