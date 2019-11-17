@@ -2,36 +2,117 @@
 #include <vector>
 #include <algorithm>
 #include <windows.h>
-				
+#include <map>
+#include <string>				
+
+
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
+#pragma region Function Declaration
+
+template<class T>
+void Print_Vector(const std::vector<T>& v);
+
+template<class U>
+void Print_Map(const std::multimap<U, U>& m);
 
 std::vector<int> Founder_Power(const std::string&);				//Looking power
 std::vector<int> Founder_odds(const std::string&);				//Looking odds
 int ConcForNegativeNumber(std::vector<int>& vector_pow);
 int ConcForPositiveNumber(std::vector<int>& vector_pow,bool);
+void Knot(const std::string& polynomial);
+#pragma endregion
 
 
-template<class T>
-void Print_Vector(const std::vector<T>& v)
+
+int main()
 {
-	
-	auto it = v.cbegin();
-	if (v.cbegin() == v.cend())
-	{
-		std::cout << "No items " << std::endl;
-		return;
-	}
-	for (; it != v.cend(); it++)
-		std::cout << *it << " ";
+	std::string str = { "100*x^432+x^4+3*x+7*x" };
+	Knot(str);
 
-	std::cout << std::endl;
+	system("pause>nul");
+	return 0;
 }
 
 
 
 
-void derivative(const std::string& polynomial)
+void AddCoefficient(std::string& s, int num) 
+{
+
+	s += std::to_string(num);
+	s += "*";
+}
+
+void AddPower(std::string& s, int num) 
+{
+
+	s += "^";
+	s += std::to_string(num);
+}
+
+
+
+
+void Compilation_Derivative(const std::multimap<int, int>& map)
+{
+	if (map.empty())
+		return;
+	
+	int Coefficient = 0;
+	int Power = 0;
+	int C = 0;
+	std::string str;
+	for (const auto& m: map) 
+	{
+		if (m.first == 1)
+		{
+			C += m.second;
+		}
+		else 
+		{
+			Coefficient = m.second * m.first;
+			Power = m.first - 1;
+			AddCoefficient(str, Coefficient);
+			str += "x";
+			AddPower(str, Power);
+			str += "+";
+
+		}
+	}
+	
+	
+	str += std::to_string(C);
+	std::cout << str << " ";
+	//std::cout << Coefficient << " " << Power;
+
+
+}
+
+//1x^22x^1
+
+
+void AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
+{
+	size_t size = vector1.size();
+	std::multimap<int, int> Derivative;
+	for (size_t i = 0; i < size; i++)
+		Derivative.emplace(vector1[i],vector2[i]);
+	
+	vector1.clear();
+	vector2.clear();
+
+	Compilation_Derivative(Derivative);
+	//Print_Map(Derivative);
+
+}
+
+
+
+
+
+
+void Knot(const std::string& polynomial)
 {	
 	
 
@@ -44,26 +125,17 @@ void derivative(const std::string& polynomial)
 		std::cout << "The number of degrees does not match the number of values" << std::endl;
 		return ;
 	}
-	SetConsoleTextAttribute(console, FOREGROUND_GREEN);
-	std::cout << "Power:\t" << " ";
-	Print_Vector(Power);
-	std::cout << "Odds:\t" << " ";
-	Print_Vector(Odds);
 	
+//	std::cout << Power.size() << " ";
+
+	AddToMap(Power, Odds); //Hash
 	
 
 }
 
 
 
-int main() 
-{
-	std::string str = {"x^2+x"};
-	derivative(str);
-		
-	system("pause>nul");
-	return 0;
-}
+
 
 
 #pragma region Parser
@@ -263,4 +335,36 @@ int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
 #pragma endregion
 
 
+#pragma region Print
 
+
+template<class T>
+void Print_Vector(const std::vector<T>& v)
+{
+
+	auto it = v.cbegin();
+	if (v.cbegin() == v.cend())
+	{
+		std::cout << "No items " << std::endl;
+		return;
+	}
+	for (; it != v.cend(); it++)
+		std::cout << *it << " ";
+
+	std::cout << std::endl;
+}
+
+template<class U>
+void Print_Map(const std::multimap<U, U>& m)
+{
+	int i = 0;
+	for (const auto& iter : m)
+	{
+		i++;
+		std::cout << "Term " << i << ")" << " Power: " << iter.first\
+			<< " Coefficient: " << iter.second << std::endl;
+	}
+
+}
+
+#pragma endregion
