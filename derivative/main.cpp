@@ -27,7 +27,7 @@ void Knot(const std::string& polynomial);
 
 int main()
 {
-	std::string str = { "100*x^432+x^4+3*x+7*x" };
+	std::string str = { "-x^2-x^3" };
 	Knot(str);
 
 	system("pause>nul");
@@ -39,14 +39,15 @@ int main()
 
 void AddCoefficient(std::string& s, int num) 
 {
-
+	
 	s += std::to_string(num);
 	s += "*";
 }
 
 void AddPower(std::string& s, int num) 
 {
-
+	if (num == 1)
+		return;
 	s += "^";
 	s += std::to_string(num);
 }
@@ -63,33 +64,31 @@ void Compilation_Derivative(const std::multimap<int, int>& map)
 	int Power = 0;
 	int C = 0;
 	std::string str;
-	for (const auto& m: map) 
+	auto iter = map.rbegin();
+	for (;iter != map.rend(); iter++)
 	{
-		if (m.first == 1)
+		if (iter->first == 1)
+			C += iter->second;
+		else
 		{
-			C += m.second;
-		}
-		else 
-		{
-			Coefficient = m.second * m.first;
-			Power = m.first - 1;
-			AddCoefficient(str, Coefficient);
+			Coefficient = iter->first * iter->second;
+			Power = iter->first - 1;
+			AddCoefficient(str,Coefficient);
 			str += "x";
-			AddPower(str, Power);
+			AddPower(str,Power);
 			str += "+";
-
 		}
-	}
+	}			//play me
+		
+	if (C != 0)
+		str += std::to_string(C);
+	else
+		str.pop_back();
 	
-	
-	str += std::to_string(C);
-	std::cout << str << " ";
-	//std::cout << Coefficient << " " << Power;
-
+	std::cout << str << std::endl;
 
 }
 
-//1x^22x^1
 
 
 void AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
