@@ -20,15 +20,48 @@ std::vector<int> Founder_Power(const std::string&);				//Looking power
 std::vector<int> Founder_odds(const std::string&);				//Looking odds
 int ConcForNegativeNumber(std::vector<int>& vector_pow);
 int ConcForPositiveNumber(std::vector<int>& vector_pow,bool);
-void Knot(const std::string& polynomial);
+void derivative(const std::string& polynomial);
 #pragma endregion
 
 
 
 int main()
 {
-	std::string str = { "-x^2-x^3" };
-	Knot(str);
+	{
+		std::string str = { "x^2+x" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t";
+		derivative(str);
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "2*x^100+100*x^2" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t";
+		derivative(str);
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "x^10000+x+1" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t";
+		derivative(str);
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "-x^2-x^3" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t";
+		derivative(str);
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "x+x+x+x+x+x+x+x+x+x" };
+		std::cout << "Function:\t" << str << std::endl;	
+		std::cout << "Derivative:\t";
+		derivative(str);
+	}
+	
 
 	system("pause>nul");
 	return 0;
@@ -54,6 +87,23 @@ void AddPower(std::string& s, int num)
 
 
 
+void Minus(std::string& s) 
+{
+	auto it = s.begin();
+	for (; it != s.end() - 2; it++) 
+	{
+		if(*it == '+')
+			if (*(it + 1) == '-')
+			{
+				s.erase(it);
+			}
+
+	}
+
+
+}
+
+
 
 void Compilation_Derivative(const std::multimap<int, int>& map)
 {
@@ -63,6 +113,7 @@ void Compilation_Derivative(const std::multimap<int, int>& map)
 	int Coefficient = 0;
 	int Power = 0;
 	int C = 0;
+	//bool flag = false;
 	std::string str;
 	auto iter = map.rbegin();
 	for (;iter != map.rend(); iter++)
@@ -71,6 +122,7 @@ void Compilation_Derivative(const std::multimap<int, int>& map)
 			C += iter->second;
 		else
 		{
+
 			Coefficient = iter->first * iter->second;
 			Power = iter->first - 1;
 			AddCoefficient(str,Coefficient);
@@ -85,6 +137,11 @@ void Compilation_Derivative(const std::multimap<int, int>& map)
 	else
 		str.pop_back();
 	
+	Minus(str);
+
+	/*if (*(str.end() - 1) == '+')
+		str.pop_back();*/
+
 	std::cout << str << std::endl;
 
 }
@@ -111,19 +168,19 @@ void AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
 
 
 
-void Knot(const std::string& polynomial)
+void derivative(const std::string& polynomial)
 {	
 	
 
 	std::vector<int> Power = Founder_Power(polynomial);
 	std::vector<int> Odds = Founder_odds(polynomial);
-
+	
 	if (Power.size() != Odds.size())
-	{
-		SetConsoleTextAttribute(console, FOREGROUND_RED);
-		std::cout << "The number of degrees does not match the number of values" << std::endl;
-		return ;
-	}
+		return;
+
+		/*SetConsoleTextAttribute(console, FOREGROUND_RED);
+		std::cout << "The number of degrees does not match the number of values" << std::endl;*/
+	
 	
 //	std::cout << Power.size() << " ";
 
@@ -332,6 +389,15 @@ int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
 }
 
 #pragma endregion
+
+
+
+
+
+
+
+
+
 
 
 #pragma region Print
