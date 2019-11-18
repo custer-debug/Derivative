@@ -1,12 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <windows.h>
 #include <map>
 #include <string>				
 
 
-HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+
 
 #pragma region Function Declaration
 
@@ -20,7 +19,7 @@ std::vector<int> Founder_Power(const std::string&);				//Looking power
 std::vector<int> Founder_odds(const std::string&);				//Looking odds
 int ConcForNegativeNumber(std::vector<int>& vector_pow);
 int ConcForPositiveNumber(std::vector<int>& vector_pow,bool);
-void derivative(const std::string& polynomial);
+std::string derivative(const std::string& polynomial);
 #pragma endregion
 
 
@@ -28,38 +27,9 @@ void derivative(const std::string& polynomial);
 int main()
 {
 	{
-		std::string str = { "x^2+x" };
+		std::string str = { "x^2-x^2+x" };
 		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t";
-		derivative(str);
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "2*x^100+100*x^2" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t";
-		derivative(str);
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "x^10000+x+1" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t";
-		derivative(str);
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "-x^2-x^3" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t";
-		derivative(str);
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "x+x+x+x+x+x+x+x+x+x" };
-		std::cout << "Function:\t" << str << std::endl;	
-		std::cout << "Derivative:\t";
-		derivative(str);
+		std::cout << "Derivative:\t" << derivative(str);
 	}
 	
 
@@ -105,50 +75,56 @@ void Minus(std::string& s)
 
 
 
-void Compilation_Derivative(const std::multimap<int, int>& map)
+
+
+
+
+
+std::string Compilation_Derivative(std::multimap<int, int>& map)
 {
 	if (map.empty())
-		return;
+		return "0";
 	
 	int Coefficient = 0;
 	int Power = 0;
 	int C = 0;
-	//bool flag = false;
 	std::string str;
-	auto iter = map.rbegin();
-	for (;iter != map.rend(); iter++)
+	//SamePower(map);
+	for (auto iter = map.rbegin() ;iter != map.rend(); iter++)
 	{
+
 		if (iter->first == 1)
 			C += iter->second;
+		else if (map.size() == 1 && iter->second == 0)
+			return "0";
 		else
 		{
-
 			Coefficient = iter->first * iter->second;
 			Power = iter->first - 1;
-			AddCoefficient(str,Coefficient);
+			AddCoefficient(str, Coefficient);
 			str += "x";
-			AddPower(str,Power);
+			AddPower(str, Power);
 			str += "+";
 		}
+
 	}			//play me
 		
 	if (C != 0)
 		str += std::to_string(C);
 	else
 		str.pop_back();
-	
+
 	Minus(str);
 
-	/*if (*(str.end() - 1) == '+')
-		str.pop_back();*/
-
-	std::cout << str << std::endl;
+	return str;
 
 }
 
 
 
-void AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
+
+
+std::string AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
 {
 	size_t size = vector1.size();
 	std::multimap<int, int> Derivative;
@@ -158,8 +134,10 @@ void AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
 	vector1.clear();
 	vector2.clear();
 
-	Compilation_Derivative(Derivative);
-	//Print_Map(Derivative);
+	Print_Map(Derivative);
+		return Compilation_Derivative(Derivative);
+	
+	
 
 }
 
@@ -168,7 +146,7 @@ void AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
 
 
 
-void derivative(const std::string& polynomial)
+std::string derivative(const std::string& polynomial)
 {	
 	
 
@@ -176,7 +154,7 @@ void derivative(const std::string& polynomial)
 	std::vector<int> Odds = Founder_odds(polynomial);
 	
 	if (Power.size() != Odds.size())
-		return;
+		return "Error";
 
 		/*SetConsoleTextAttribute(console, FOREGROUND_RED);
 		std::cout << "The number of degrees does not match the number of values" << std::endl;*/
@@ -184,7 +162,7 @@ void derivative(const std::string& polynomial)
 	
 //	std::cout << Power.size() << " ";
 
-	AddToMap(Power, Odds); //Hash
+	return AddToMap(Power, Odds); //Hash
 	
 
 }
