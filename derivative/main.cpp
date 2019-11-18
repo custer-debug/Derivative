@@ -4,6 +4,8 @@
 #include <map>
 #include <string>				
 
+typedef		std::multimap<int, int>	MULT;
+typedef		std::map<int, int>		MAP;
 
 
 
@@ -12,8 +14,10 @@
 template<class T>
 void Print_Vector(const std::vector<T>& v);
 
-template<class U>
-void Print_Map(const std::multimap<U, U>& m);
+
+void Print_Map(const MAP& m);
+void Print_MultMap(const MULT& m);
+
 
 std::vector<int> Founder_Power(const std::string&);				//Looking power
 std::vector<int> Founder_odds(const std::string&);				//Looking odds
@@ -27,7 +31,7 @@ std::string derivative(const std::string& polynomial);
 int main()
 {
 	{
-		std::string str = { "x^2-x^2+x" };
+		std::string str = { "x^2+x" };
 		std::cout << "Function:\t" << str << std::endl;
 		std::cout << "Derivative:\t" << derivative(str);
 	}
@@ -55,8 +59,6 @@ void AddPower(std::string& s, int num)
 	s += std::to_string(num);
 }
 
-
-
 void Minus(std::string& s) 
 {
 	auto it = s.begin();
@@ -75,51 +77,59 @@ void Minus(std::string& s)
 
 
 
-
-
-
-
-
-std::string Compilation_Derivative(std::multimap<int, int>& map)
+void SimilarTerm( MULT& mult, MAP& map) 
 {
-	if (map.empty())
+	std::cout << "Similar Term" << std::endl;
+	auto it1 = mult.begin();
+	map[it1->first] = it1->second;
+	it1++;
+
+	for (; it1 != mult.end(); it1++)
+		for (auto it2 = map.begin(); it2 != map.end(); it2++)
+			if (it1->first == it2->first)
+				map[it2->first] = it1->second + it2->second; //similar terms
+
+	mult.clear();
+}
+
+
+std::string Compilation_Derivative(MULT& Func)
+{
+
+	if (Func.empty())
 		return "0";
+
 	
-	int Coefficient = 0;
-	int Power = 0;
-	int C = 0;
 	std::string str;
-	//SamePower(map);
-	for (auto iter = map.rbegin() ;iter != map.rend(); iter++)
-	{
+	MULT mult;	//crude derivative
+	MAP map;	//Abbreviated derivative
 
-		if (iter->first == 1)
-			C += iter->second;
-		else if (map.size() == 1 && iter->second == 0)
-			return "0";
-		else
-		{
-			Coefficient = iter->first * iter->second;
-			Power = iter->first - 1;
-			AddCoefficient(str, Coefficient);
-			str += "x";
-			AddPower(str, Power);
-			str += "+";
-		}
+	for (auto it = Func.begin(); it != Func.end(); it++)
+		mult.emplace(it->first - 1,it->first * it->second);//calculate the derivative
+	Func.clear();
+	Print_MultMap(mult);
 
-	}			//play me
-		
-	if (C != 0)
-		str += std::to_string(C);
-	else
-		str.pop_back();
+	auto flag = [&mult]() {
+		std::vector<int> tmp;
+		for (const auto& m : mult)
+			tmp.push_back(m.first);
+		Print_Vector(tmp);
+		std::cout << "Size = " << tmp.size() << std::endl;
+		for (int i = 0; i < tmp.size(); i++)
+			for (int j = i; j < tmp.size(); i++)
+				if (tmp[i] == tmp[j])
+					return true;
+		//vector[iter] == vector[iter]
+		return false;
+	};
 
-	Minus(str);
+	std::cout << flag() << std::endl;
 
+
+	Print_Map(map);
 	return str;
 
 }
-
 
 
 
@@ -134,7 +144,8 @@ std::string AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
 	vector1.clear();
 	vector2.clear();
 
-	Print_Map(Derivative);
+
+
 		return Compilation_Derivative(Derivative);
 	
 	
@@ -159,8 +170,6 @@ std::string derivative(const std::string& polynomial)
 		/*SetConsoleTextAttribute(console, FOREGROUND_RED);
 		std::cout << "The number of degrees does not match the number of values" << std::endl;*/
 	
-	
-//	std::cout << Power.size() << " ";
 
 	return AddToMap(Power, Odds); //Hash
 	
@@ -384,6 +393,7 @@ int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
 template<class T>
 void Print_Vector(const std::vector<T>& v)
 {
+	std::cout << "print vector" << std::endl;
 
 	auto it = v.cbegin();
 	if (v.cbegin() == v.cend())
@@ -397,9 +407,10 @@ void Print_Vector(const std::vector<T>& v)
 	std::cout << std::endl;
 }
 
-template<class U>
-void Print_Map(const std::multimap<U, U>& m)
+void Print_Map(const MAP& m)
 {
+	std::cout << "print map" << std::endl;
+
 	int i = 0;
 	for (const auto& iter : m)
 	{
@@ -407,7 +418,24 @@ void Print_Map(const std::multimap<U, U>& m)
 		std::cout << "Term " << i << ")" << " Power: " << iter.first\
 			<< " Coefficient: " << iter.second << std::endl;
 	}
-
+	std::cout << std::endl;
 }
+
+void Print_MultMap(const MULT& m)
+{
+	std::cout << "print multimap" << std::endl;
+
+	int i = 0;
+	for (const auto& iter : m)
+	{
+		i++;
+		std::cout << "Term " << i << ")" << " Power: " << iter.first\
+			<< " Coefficient: " << iter.second << std::endl;
+	}
+	std::cout << std::endl;
+}
+
+
+
 
 #pragma endregion
