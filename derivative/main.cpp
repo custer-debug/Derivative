@@ -31,18 +31,41 @@ std::string derivative(const std::string& polynomial);
 int main()
 {
 	{
-		std::string str = { "x^2+x" };
+		std::string str = { "x+x^2+x^4" };
 		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t" << derivative(str);
+		std::cout << "Derivative:\t" << derivative(str) << std::endl;
 	}
-	
+	std::cout << std::endl;
+	{
+		std::string str = { "x+x+x+x+x" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t" << derivative(str) << std::endl;
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "x-x+x-x" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t" << derivative(str) << std::endl;
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "x^2-x^2+x" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t" << derivative(str) << std::endl;
+	}
+	std::cout << std::endl;
+	{
+		std::string str = { "x^123+4*x^415" };
+		std::cout << "Function:\t" << str << std::endl;
+		std::cout << "Derivative:\t" << derivative(str) << std::endl;
+	}
 
-	system("pause>nul");
+	//system("pause>nul");
 	return 0;
 }
 
 
-
+#pragma region Add
 
 void AddCoefficient(std::string& s, int num) 
 {
@@ -54,9 +77,21 @@ void AddCoefficient(std::string& s, int num)
 void AddPower(std::string& s, int num) 
 {
 	if (num == 1)
+	{
+		s += "x";
 		return;
-	s += "^";
-	s += std::to_string(num);
+	}
+	else if (num == 0)
+		s.pop_back();
+	else 
+	{
+		s += "^";
+		s += std::to_string(num);
+	}
+
+
+	
+
 }
 
 void Minus(std::string& s) 
@@ -75,21 +110,13 @@ void Minus(std::string& s)
 
 }
 
+#pragma endregion
 
 
-void SimilarTerm( MULT& mult, MAP& map) 
+void SimilarTerm() 
 {
-	std::cout << "Similar Term" << std::endl;
-	auto it1 = mult.begin();
-	map[it1->first] = it1->second;
-	it1++;
 
-	for (; it1 != mult.end(); it1++)
-		for (auto it2 = map.begin(); it2 != map.end(); it2++)
-			if (it1->first == it2->first)
-				map[it2->first] = it1->second + it2->second; //similar terms
 
-	mult.clear();
 }
 
 
@@ -98,35 +125,41 @@ std::string Compilation_Derivative(MULT& Func)
 
 	if (Func.empty())
 		return "0";
-
-	
 	std::string str;
-	MULT mult;	//crude derivative
-	MAP map;	//Abbreviated derivative
+	MULT mult;
 
 	for (auto it = Func.begin(); it != Func.end(); it++)
-		mult.emplace(it->first - 1,it->first * it->second);//calculate the derivative
-	Func.clear();
-	Print_MultMap(mult);
+		mult.emplace(it->first - 1, it->first*it->second);
 
-	auto flag = [&mult]() {
-		std::vector<int> tmp;
-		for (const auto& m : mult)
-			tmp.push_back(m.first);
-		Print_Vector(tmp);
-		std::cout << "Size = " << tmp.size() << std::endl;
-		for (int i = 0; i < tmp.size(); i++)
-			for (int j = i; j < tmp.size(); i++)
-				if (tmp[i] == tmp[j])
-					return true;
-		//vector[iter] == vector[iter]
-		return false;
-	};
-
-	std::cout << flag() << std::endl;
+	auto it = mult.rbegin();
 
 
-	Print_Map(map);
+	if (mult.size() == 1)
+	{
+		AddCoefficient(str,it->second);
+		AddPower(str, it->first);
+	}
+	else 
+	{
+
+		for (;it != mult.rend(); it++) 
+		{
+			AddCoefficient(str,it->second);
+			AddPower(str,it->first);
+			str += "+";
+		}
+
+		str.pop_back();
+
+	}
+
+
+	/*for (auto it = mult.begin(); it != mult.end(); it++)
+		for (auto it1 = it; it1 != mult.end(); it1++)
+			if (it->first == it1->first)*/
+				
+
+
 	return str;
 
 }
@@ -143,7 +176,6 @@ std::string AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
 	
 	vector1.clear();
 	vector2.clear();
-
 
 
 		return Compilation_Derivative(Derivative);
