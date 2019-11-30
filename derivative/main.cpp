@@ -2,27 +2,26 @@
 #include <vector>
 #include <algorithm>
 #include <map>
-#include <string>				
+#include <string>		
+
 
 typedef		std::multimap<int, int>	MULT;
-typedef		std::map<int, int>		MAP;
-
+typedef		std::map<int, int> MAP;
 
 
 #pragma region Function Declaration
 
 template<class T>
 void Print_Vector(const std::vector<T>& v);
-
-
 void Print_Map(const MAP& m);
 void Print_MultMap(const MULT& m);
+
 
 
 std::vector<int> Founder_Power(const std::string&);				//Looking power
 std::vector<int> Founder_odds(const std::string&);				//Looking odds
 int ConcForNegativeNumber(std::vector<int>& vector_pow);
-int ConcForPositiveNumber(std::vector<int>& vector_pow,bool);
+int ConcForPositiveNumber(std::vector<int>& vector_pow, bool);
 std::string derivative(const std::string& polynomial);
 #pragma endregion
 
@@ -30,181 +29,181 @@ std::string derivative(const std::string& polynomial);
 
 int main()
 {
+	int flag = 0;
+	std::string str;
+	std::cout << "Hello! This program calculates the derivative." << std::endl;
+	std::cout << "Enter the function. For the operation of multiplication, use the sign *" << std::endl;
+	std::cout << "For exponentiation operation ^" << std::endl;
+	
+	while (true) 
 	{
-		std::string str = { "x+x^2+x^4" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t" << derivative(str) << std::endl;
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "x+x+x+x+x" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t" << derivative(str) << std::endl;
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "x-x+x-x" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t" << derivative(str) << std::endl;
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "x^2-x^2+x" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t" << derivative(str) << std::endl;
-	}
-	std::cout << std::endl;
-	{
-		std::string str = { "x^123+4*x^415" };
-		std::cout << "Function:\t" << str << std::endl;
-		std::cout << "Derivative:\t" << derivative(str) << std::endl;
+		std::cout << "Enter the function: ";
+		std::cin >> str;
+		system("cls");
+		std::cout << "Your funcrion: " << str <<std::endl;
+		std::cout << "Derivative: " << derivative(str) << std::endl;
+		system("pause>nul");
+		std::cout << "Do u wonna continue?" << std::endl;
+		std::cout << "1.Yes" << std::endl;
+		std::cout << "2.No" << std::endl;
+		std::cin >> flag;
+		if (flag == 2)
+			break;
+			
+		
+
 	}
 
-	//system("pause>nul");
 	return 0;
 }
 
 
-#pragma region Add
 
-void AddCoefficient(std::string& s, int num) 
+std::string DeleteFirstPlus(const std::string& s)
 {
-	
-	s += std::to_string(num);
-	s += "*";
-}
-
-void AddPower(std::string& s, int num) 
-{
-	if (num == 1)
+	std::string str;
+	if (s[0] == '+')
 	{
-		s += "x";
-		return;
-	}
-	else if (num == 0)
-		s.pop_back();
-	else 
-	{
-		s += "^";
-		s += std::to_string(num);
-	}
-
-
-	
-
-}
-
-void Minus(std::string& s) 
-{
-	auto it = s.begin();
-	for (; it != s.end() - 2; it++) 
-	{
-		if(*it == '+')
-			if (*(it + 1) == '-')
-			{
-				s.erase(it);
-			}
+		for (int i = 1; i != s.length(); i++)
+			str += s[i];
 
 	}
+	else
+		str = s;
 
-
+	return str;
 }
 
-#pragma endregion
 
 
-void SimilarTerm() 
+std::string MapToString(const MAP& m)
 {
+	std::string str;
+
+	for (auto it = m.rbegin(); it != m.rend(); it++)
+	{
+		if (it->second == 0)
+			continue;
+
+		if (it->first == 1 && it->second == 1)
+			str += "+x";
+		else if (it->first == 1 && it->second == 1 && it == m.rbegin())
+			str += "x";
+		else if (it->first == 0 && it->second == 1)
+		{
+			str += "+";
+			str += std::to_string(it->second);
+		}
+		else if (it->first == 0 && it == m.rbegin())
+			return std::to_string(it->second);
+		else if (it->first == 0 && it->second > 0)
+		{
+			str += "+";
+			str += std::to_string(it->second);
+		}
+		else if (it->first == 0 && it->second < 0)
+			str += std::to_string(it->second);
+		else if (it->first == 1 && it->second > 0)
+		{
+			str += "+";
+			str += std::to_string(it->second);
+			str += "*x";
+		}
+		else if (it->first == 1 && it->second < 0)
+		{
+			str += std::to_string(it->second);
+			str += "*x";
+		}
+		else if (it->first > 1 && it->second > 0)
+		{
+			str += "+";
+			str += std::to_string(it->second);
+			str += "*x^";
+			str += std::to_string(it->first);
+		}
+		else if (it->first > 1 && it->second < 0)
+		{
+			str += std::to_string(it->second);
+			str += "*x^";
+			str += std::to_string(it->first);
+		}
+
+	}
+
+	str = DeleteFirstPlus(str);
+
+	return str;
+}
 
 
+MAP SimilarCoef(MULT& mult)
+{
+	MAP res;
+	for (auto it1 = mult.begin(); it1 != mult.end(); it1++)
+		for (auto it2 = it1; it2 != mult.end(); it2++)
+			if (it1 != it2)
+				if (it1->first == it2->first)
+					it1->second += it2->second;
+
+	for (auto it = mult.begin(); it != mult.end(); it++)
+		res.emplace(it->first, it->second);
+
+
+	/*for (auto it = res.begin(); it != res.end(); it++)
+		std::cout << it->first << " " << it->second << std::endl;*/
+
+
+	return res;
 }
 
 
 std::string Compilation_Derivative(MULT& Func)
 {
-
 	if (Func.empty())
 		return "0";
-	std::string str;
+
 	MULT mult;
 
 	for (auto it = Func.begin(); it != Func.end(); it++)
-		mult.emplace(it->first - 1, it->first*it->second);
+		mult.emplace(it->first - 1, it->first * it->second);
 
-	auto it = mult.rbegin();
+	MAP map = SimilarCoef(mult);
 
-
-	if (mult.size() == 1)
-	{
-		AddCoefficient(str,it->second);
-		AddPower(str, it->first);
-	}
-	else 
-	{
-
-		for (;it != mult.rend(); it++) 
-		{
-			AddCoefficient(str,it->second);
-			AddPower(str,it->first);
-			str += "+";
-		}
-
-		str.pop_back();
-
-	}
-
-
-	/*for (auto it = mult.begin(); it != mult.end(); it++)
-		for (auto it1 = it; it1 != mult.end(); it1++)
-			if (it->first == it1->first)*/
-				
-
-
-	return str;
-
+	return MapToString(map);
 }
 
-
-
-
-std::string AddToMap(std::vector<int>& vector1,std::vector<int>& vector2)
+std::string AddToMap(std::vector<int>& vector1, std::vector<int>& vector2)
 {
 	size_t size = vector1.size();
 	std::multimap<int, int> Derivative;
 	for (size_t i = 0; i < size; i++)
-		Derivative.emplace(vector1[i],vector2[i]);
-	
+		Derivative.emplace(vector1[i], vector2[i]);
+
 	vector1.clear();
 	vector2.clear();
 
 
-		return Compilation_Derivative(Derivative);
-	
-	
+	return Compilation_Derivative(Derivative);
+
+
 
 }
 
 
-
-
-
-
 std::string derivative(const std::string& polynomial)
-{	
-	
+{
+
 
 	std::vector<int> Power = Founder_Power(polynomial);
 	std::vector<int> Odds = Founder_odds(polynomial);
-	
+
 	if (Power.size() != Odds.size())
 		return "Error";
 
-		/*SetConsoleTextAttribute(console, FOREGROUND_RED);
-		std::cout << "The number of degrees does not match the number of values" << std::endl;*/
 	
 
 	return AddToMap(Power, Odds); //Hash
-	
+
 
 }
 
@@ -220,12 +219,12 @@ std::vector<int> Founder_odds(const std::string& s)
 	std::vector<int> odds;
 	std::vector<int> odds_in_function;
 	auto it = s.cbegin();
-	for (; it != s.cend(); it++) 
+	for (; it != s.cend(); it++)
 	{
 		if (*it == 'x')	//Find virable
 		{
 			auto it1 = it;
-			if (it1 == s.begin()) 
+			if (it1 == s.begin())
 			{
 				odds_in_function.push_back(1);
 				continue;
@@ -245,10 +244,10 @@ std::vector<int> Founder_odds(const std::string& s)
 			{
 				odds_in_function.push_back(1);
 				continue;
-			}	
-				
+			}
 
-			
+
+
 
 			while (true)
 			{
@@ -279,11 +278,11 @@ std::vector<int> Founder_odds(const std::string& s)
 			}
 			odds_in_function.push_back(*(odds.cend() - 1) > 0 ? ConcForPositiveNumber(odds, true) : \
 				ConcForNegativeNumber(odds));
-			
-		}	
-		
+
+		}
+
 	}
-	
+
 	return odds_in_function;
 }
 
@@ -312,10 +311,11 @@ std::vector<int> Founder_Power(const std::string& s)
 
 			} while (*it != '+' && *it != '-');
 
-			Pow_of_function.push_back(ConcForPositiveNumber(Number_of_power,false) );
-		
-		
-		}else if(*it == 'x')
+			Pow_of_function.push_back(ConcForPositiveNumber(Number_of_power, false));
+
+
+		}
+		else if (*it == 'x')
 		{
 
 			if (it == s.cend() - 1)
@@ -323,16 +323,16 @@ std::vector<int> Founder_Power(const std::string& s)
 				Pow_of_function.push_back(1);
 				break;
 			}
-			if (*(it + 1) == '+' || *(it + 1) == '-' )
+			if (*(it + 1) == '+' || *(it + 1) == '-')
 				Pow_of_function.push_back(1);
 		}
 
 	}
-	
+
 	return Pow_of_function;
 }
 
-bool Asci_function(std::vector<int>& vector_ascii) 
+bool Asci_function(std::vector<int>& vector_ascii)
 {
 	for (int i = 0; i < (int)vector_ascii.size(); i++)
 	{
@@ -351,19 +351,19 @@ bool Asci_function(std::vector<int>& vector_ascii)
 		case -1:vector_ascii[i] = -1;   break;
 		case 1:vector_ascii[i] = 1;   break;
 
-			case int('+') : vector_ascii.erase(std::begin(vector_ascii) + i,\
+			case int('+') : vector_ascii.erase(std::begin(vector_ascii) + i, \
 				std::begin(vector_ascii) + i + 1); break;
-		default:
-			std::cout << "This is not a number! " << \
-			 vector_ascii[i] << std::endl;
-			return false;
-			break;
+			default:
+				std::cout << "This is not a number! " << \
+					vector_ascii[i] << std::endl;
+				return false;
+				break;
 		}
 	}
 	return true;
 }
 
-int Concantination(std::vector<int>& vector) 
+int Concantination(std::vector<int>& vector)
 {
 	int con = 0;
 	int coef = 1;
@@ -395,7 +395,7 @@ int ConcForNegativeNumber(std::vector<int>& vector_pow)
 	return -1;
 }
 
-int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
+int ConcForPositiveNumber(std::vector<int>& vector_pow, bool flag = false)
 {
 	if (!Asci_function(vector_pow))
 		return 0;
@@ -425,7 +425,8 @@ int ConcForPositiveNumber(std::vector<int>& vector_pow,bool flag = false)
 template<class T>
 void Print_Vector(const std::vector<T>& v)
 {
-	std::cout << "print vector" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Print vector" << std::endl;
 
 	auto it = v.cbegin();
 	if (v.cbegin() == v.cend())
@@ -439,9 +440,12 @@ void Print_Vector(const std::vector<T>& v)
 	std::cout << std::endl;
 }
 
+
+
 void Print_Map(const MAP& m)
 {
-	std::cout << "print map" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Print multimap" << std::endl;
 
 	int i = 0;
 	for (const auto& iter : m)
@@ -453,9 +457,11 @@ void Print_Map(const MAP& m)
 	std::cout << std::endl;
 }
 
+
 void Print_MultMap(const MULT& m)
 {
-	std::cout << "print multimap" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Print multimap" << std::endl;
 
 	int i = 0;
 	for (const auto& iter : m)
